@@ -1,66 +1,82 @@
 import React, { useState } from 'react';
-import { Button, Form, Container, Header } from 'semantic-ui-react';
+import { Grid, Item, Button, Form, Container, Header } from 'semantic-ui-react';
+import SemanticDatepicker from 'react-semantic-ui-datepickers';
+import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import axios from 'axios';
+import moment from 'moment';
 import './App.css';
 
 function App() {
-	const [name, setName] = useState('');
-	const [age, setAge] = useState('');
-	const [salary, setSalary] = useState('');
-	const [hobby, setHobby] = useState('');
+	const URL = 'https://sheet.best/api/sheets/2b8fbe1b-8ac1-4211-857b-255082c88b9c';
+	const [list, setList] = useState([]);
+	const [lastDate, setLastDate] = useState(null);
+	const [days, setDays] = useState(0);
+	const [currentDate, setNewDate] = useState(null);
+	const onChange = (event, data) => setNewDate(data.value);
+
+	const getList = () => {
+		axios.get(URL)
+			.then((response) => {
+				console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
+				setList(response.data.reverse());
+				setLastDate(response.data[0].Date)
+			});
+	}
+
+	React.useEffect(() => {
+		getList();
+	}, []);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		const objt = { name, age, salary, hobby };
+		var a = moment(currentDate);
+		var b = moment(lastDate, "MM/DD/YY");
+		const diffDays = a.diff(b, 'days') // 1
+		setDays(diffDays)
 
-		axios
-			.post(
-				'https://sheet.best/api/sheets/8abefc9d-5af1-4c54-b1c3-e010462fd81a',
-				objt
-			)
+		const objt = { Date: moment(currentDate).format("MM/DD/YY"), Days: diffDays };
+		console.log("**** before submiting", objt)
+
+		axios.post(URL, objt)
 			.then((response) => {
 				console.log(response);
+				getList();
 			});
 	};
 
 	return (
 		<Container fluid className="container">
-			<Header as="h2">React google sheet</Header>
-			<Form className="form">
-				<Form.Field>
-					<label>Name</label>
-					<input
-						placeholder="Enter your Name"
-						onChange={(e) => setName(e.target.value)}
-					/>
-				</Form.Field>
-				<Form.Field>
-					<label>Age</label>
-					<input
-						placeholder="Enter your Age"
-						onChange={(e) => setAge(e.target.value)}
-					/>
-				</Form.Field>
-				<Form.Field>
-					<label>Salary</label>
-					<input
-						placeholder="Enter your Salary"
-						onChange={(e) => setSalary(e.target.value)}
-					/>
-				</Form.Field>
-				<Form.Field>
-					<label>Hobby</label>
-					<input
-						placeholder="Enter your Hobby"
-						onChange={(e) => setHobby(e.target.value)}
-					/>
-				</Form.Field>
-
-				<Button color="blue" type="submit" onClick={handleSubmit}>
-					Submit
-				</Button>
-			</Form>
+			<Grid columns={2} divided>
+				<Grid.Row>
+					<Grid.Column>
+						<Header as="h2">Add TP Log</Header>
+						{lastDate} - {days}
+						<Form className="form">
+							<Form.Field>
+								<label>Date</label>
+								<SemanticDatepicker format={'MM/DD/YY'} onChange={onChange} />
+							</Form.Field>
+							<Button color="blue" type="submit" onClick={handleSubmit}>
+								Submit
+							</Button>
+						</Form>
+					</Grid.Column>
+					<Grid.Column>
+						<Header as="h2">TP Logs</Header>
+						<Item.Group>
+							{list && list.map((item,index)=>(
+								<Item key={index}>
+									<Item.Content>
+										<Item.Header>{item.Date}</Item.Header>
+										<Item.Description>{item.Days}</Item.Description>
+									</Item.Content>
+								</Item>
+							))}
+						</Item.Group>
+					</Grid.Column>
+				</Grid.Row>
+			</Grid>
 		</Container>
 	);
 }
