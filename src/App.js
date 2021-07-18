@@ -7,7 +7,7 @@ import moment from 'moment';
 import './App.css';
 
 function App() {
-	const URL = 'https://sheet.best/api/sheets/2b8fbe1b-8ac1-4211-857b-255082c88b9c';
+	const URL = process.env.REACT_APP_GS_URL;
 	const [list, setList] = useState([]);
 	const [lastDate, setLastDate] = useState(null);
 	const [days, setDays] = useState(0);
@@ -51,7 +51,6 @@ function App() {
 				<Grid.Row>
 					<Grid.Column>
 						<Header as="h2">Add TP Log</Header>
-						{lastDate} - {days}
 						<Form className="form">
 							<Form.Field>
 								<label>Date</label>
