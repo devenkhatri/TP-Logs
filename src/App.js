@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Item, Button, Form, Container, Header } from 'semantic-ui-react';
+import { Grid, Item, Button, Form, Container, Header, Label, Table, GridColumn } from 'semantic-ui-react';
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import axios from 'axios';
@@ -17,8 +17,8 @@ function App() {
 	const getList = () => {
 		axios.get(URL)
 			.then((response) => {
-				console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
-				setList(response.data.reverse());
+				// console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
+				setList(response.data.reverse().slice(0, 5));
 				setLastDate(response.data[0].Date)
 			});
 	}
@@ -36,7 +36,7 @@ function App() {
 		setDays(diffDays)
 
 		const objt = { Date: moment(currentDate).format("MM/DD/YY"), Days: diffDays };
-		console.log("**** before submiting", objt)
+		// console.log("**** before submiting", objt)
 
 		axios.post(URL, objt)
 			.then((response) => {
@@ -47,10 +47,12 @@ function App() {
 
 	return (
 		<Container fluid className="container">
-			<Grid columns={2} divided>
-				<Grid.Row>
-					<Grid.Column>
-						<Header as="h2">Add TP Log</Header>
+			<Grid stackable divided='vertically'>
+				<Grid.Row columns={2}>
+					<GridColumn>
+						<Header as="h1">Add TP Log</Header>
+					</GridColumn>
+					<GridColumn>
 						<Form className="form">
 							<Form.Field>
 								<label>Date</label>
@@ -60,20 +62,31 @@ function App() {
 								Submit
 							</Button>
 						</Form>
-					</Grid.Column>
-					<Grid.Column>
-						<Header as="h2">TP Logs</Header>
-						<Item.Group>
-							{list && list.map((item,index)=>(
-								<Item key={index}>
-									<Item.Content>
-										<Item.Header>{item.Date}</Item.Header>
-										<Item.Description>{item.Days}</Item.Description>
-									</Item.Content>
-								</Item>
-							))}
-						</Item.Group>
-					</Grid.Column>
+					</GridColumn>
+				</Grid.Row>
+				<Grid.Row>
+					<GridColumn>
+						<Header as="h1">Past TP Logs</Header>
+						<Table celled color={'blue'}>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Date</Table.HeaderCell>
+									<Table.HeaderCell>Different</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+
+							<Table.Body>
+								{list && list.map((item, index) => (
+									<Table.Row>
+										<Table.Cell>
+											<Label>{moment(item.Date).format("DD-MMM-YYYY")}</Label>
+										</Table.Cell>
+										<Table.Cell>{item.Days}</Table.Cell>
+									</Table.Row>
+								))}
+							</Table.Body>
+						</Table>
+					</GridColumn>
 				</Grid.Row>
 			</Grid>
 		</Container>
