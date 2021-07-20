@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Item, Button, Form, Container, Header, Label, Table, GridColumn } from 'semantic-ui-react';
+import { Grid, Button, Form, Container, Header, Label, Table, GridColumn } from 'semantic-ui-react';
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import axios from 'axios';
@@ -25,7 +25,7 @@ function App() {
 
 	React.useEffect(() => {
 		getList();
-	}, []);
+	});
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -36,7 +36,7 @@ function App() {
 		setDays(diffDays)
 
 		const objt = { Date: moment(currentDate).format("MM/DD/YY"), Days: diffDays };
-		// console.log("**** before submiting", objt)
+		console.log("**** before submiting", objt, days)
 
 		axios.post(URL, objt)
 			.then((response) => {
@@ -77,7 +77,7 @@ function App() {
 
 							<Table.Body>
 								{list && list.map((item, index) => (
-									<Table.Row>
+									<Table.Row key={index}>
 										<Table.Cell>
 											<Label>{moment(item.Date).format("DD-MMM-YYYY")}</Label>
 										</Table.Cell>
