@@ -5,29 +5,41 @@ import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import axios from 'axios';
 import moment from 'moment';
 import './App.css';
+import useGoogleSheets from 'use-google-sheets';
 
 function App() {
-	const URL = process.env.REACT_APP_GS_URL;
-	const [loaded, setLoaded] = useState(false);
+	const URL = process.env.REACT_APP_GS_URL;	
 	const [list, setList] = useState([]);
 	const [lastDate, setLastDate] = useState(null);
 	const [days, setDays] = useState(0);
 	const [currentDate, setNewDate] = useState(null);
 	const onChange = (event, data) => setNewDate(data.value);
+	const { data } = useGoogleSheets({
+		apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+		sheetId: process.env.REACT_APP_GOOGLE_SHEETS_ID,
+		sheetsNames: ['H'],
+	  });
+	  const [loaded, setLoaded] = useState(false);
 
 	const getList = () => {
-		axios.get(URL)
-			.then((response) => {
-				// console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
-				setList(response.data.reverse().slice(0, 5));
-				setLastDate(response.data[0].Date)
-				setLoaded(true);
-			});		
+		if(data && data.length>0){
+			const mainData = data[0].data.reverse().slice(0, 5)
+			setList(mainData);
+			setLastDate(mainData[0].Date);
+			setLoaded(true);
+			// axios.get(URL)
+			// 	.then((response) => {
+			// 		// console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
+			// 		setList(response.data.reverse().slice(0, 5));
+			// 		setLastDate(response.data[0].Date)
+			// 		setLoaded(true);
+			// 	});		
+		}
 	}
 
-	React.useEffect(() => {
+	React.useEffect(() => {		
 		getList();
-	});
+	},[data]);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
