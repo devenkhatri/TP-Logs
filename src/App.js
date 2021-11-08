@@ -15,7 +15,7 @@ function App() {
 	const [currentDate, setNewDate] = useState(null);
 	const onChange = (event, data) => setNewDate(data.value);
 	const { data } = useGoogleSheets({
-		apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+		apiKey: process.env.REACT_APP_GOOGLE_API_KEY_1+process.env.REACT_APP_GOOGLE_API_KEY_2,
 		sheetId: process.env.REACT_APP_GOOGLE_SHEETS_ID,
 		sheetsNames: ['H'],
 	  });
