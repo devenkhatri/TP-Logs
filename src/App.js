@@ -21,7 +21,7 @@ function App() {
 	  });
 	  const [loaded, setLoaded] = useState(false);
 
-	const getList = () => {
+	const getList = useCallback(() => {
 		if(data && data.length>0){
 			const mainData = data[0].data.reverse().slice(0, 5)
 			setList(mainData);
@@ -35,11 +35,11 @@ function App() {
 			// 		setLoaded(true);
 			// 	});		
 		}
-	}
+	}, [data])
 
 	React.useEffect(() => {		
 		getList();
-	},[data]);
+	},[data, getList]);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
