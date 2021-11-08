@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Button, Form, Container, Header, Label, Table, GridColumn } from 'semantic-ui-react';
+import { Grid, Button, Form, Container, Header, Label, Table, GridColumn, Loader } from 'semantic-ui-react';
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import axios from 'axios';
@@ -8,6 +8,7 @@ import './App.css';
 
 function App() {
 	const URL = process.env.REACT_APP_GS_URL;
+	const [loaded, setLoaded] = useState(false);
 	const [list, setList] = useState([]);
 	const [lastDate, setLastDate] = useState(null);
 	const [days, setDays] = useState(0);
@@ -20,7 +21,8 @@ function App() {
 				// console.log(response.data, response.data.length, response.data[response.data.length - 1].Date);
 				setList(response.data.reverse().slice(0, 5));
 				setLastDate(response.data[0].Date)
-			});
+				setLoaded(true);
+			});		
 	}
 
 	React.useEffect(() => {
@@ -29,6 +31,8 @@ function App() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+
+		setLoaded(false);
 
 		var a = moment(currentDate);
 		var b = moment(lastDate, "MM/DD/YY");
@@ -64,6 +68,11 @@ function App() {
 						</Form>
 					</GridColumn>
 				</Grid.Row>
+				{!loaded &&
+					<Grid.Row>
+						<Loader active inline='centered'>Processing...</Loader>
+					</Grid.Row>
+				}
 				<Grid.Row>
 					<GridColumn>
 						<Header as="h1">Past TP Logs</Header>
